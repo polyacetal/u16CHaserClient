@@ -1,6 +1,6 @@
 class CHaserAct
 
-    def initialize(target, path)  #コンストラクタ
+    def initialize(target, map)  #コンストラクタ
         @target = target    #main.rbのtargetをインスタンス変数として持つ
         @values = Array.new(10) #valuesの配列
         @lookValues = Array.new(10) #lookした値
@@ -10,7 +10,7 @@ class CHaserAct
         @beforeMove = []    #前回移動した方向(常に先頭が1つ前の行動になるよう配列が伸びる)
         @ableDirection = ["Up", "Left", "Right", "Down"] #行動可能方向の定数(これと差分を取ることでいい感じになる)
         @direction = "Start" #方向を文字列で持つ(最初はstart)
-        #map = CHaserMap.new(path)
+        @map = map
     end
 
     def Move()  #walkの処理
@@ -63,19 +63,6 @@ class CHaserAct
             MarkDire(i, "@itemDire") if @values[i] == 3     #記録する配列は@itemDire
         end
     end
-
-    =begin
-    def Nomal(values)   #通常時の行動メソッド(壁避けとランダムウォーク)
-        @values = values
-        WhereBlock()
-        ableMove = @ableDirection - @blockDire
-        @direction = ableMove.sample
-        Move()
-        @blockDire.clear
-        #return ItemCheck()
-        return "Nomal"
-    end
-    =end
 
     def RandomWalk()
         WhereBlock()
@@ -133,28 +120,26 @@ class CHaserAct
         return selection
     end
 
-    =begin
     def SuspicionTrap() #トラップの可能性があるかのチェック
-        selection = "ItemGet"   #トラップがなければ次のメソッドをItemGetに
         case @direction
             when "Up"   #上にトラップの可能性
                 if @values[1] == 2 && @values[3] == 2
-                    selection = "isTrap"    #次のメソッドをisTrapに
+                    return "isTrap"    #次のメソッドをisTrapに
                 end
             when "Left"
                 if @values[1] == 2 && @values[7] == 2
-                    selection = "isTrap"    #次のメソッドをisTrapに
+                    return "isTrap"    #次のメソッドをisTrapに
                 end
             when "Right"
                 if @values[3] == 2 && @values[9] == 2
-                    selection = "isTrap"    #次のメソッドをisTrapに
+                    return "isTrap"    #次のメソッドをisTrapに
                 end
             when "Down"
                 if @values[7] == 2 && @values[9] == 2
-                    selection = "isTrap"    #次のメソッドをisTrapに
+                    return "isTrap"    #次のメソッドをisTrapに
                 end
         end
-        return selection    #selectionをreturnする
+        return ItemGet()    #selectionをreturnする
     end
 
     def ItemCheck() #getReadyで手に入れた情報のアイテム処理用のメソッド
@@ -163,13 +148,11 @@ class CHaserAct
         @direction = ableItem.sample
         @itemDire.clear
         if ableItem.length == 0
-            selection = "Nomal"
+            return false
         else
-            selection = SuspicionTrap()
+            return true
         end
-        return selection
     end
-    =end
 
     def isTrap(values)
         Look()
