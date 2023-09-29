@@ -6,7 +6,8 @@ require 'CHaserMap.rb'
 # 書き換えない
 path = ""
 target = CHaserConnect.new("白鷺の姫君") # ()の中好きな名前
-map = CHaserMap.new(path)
+#map = CHaserMap.new(path)
+map = ""
 act = CHaserAct.new(target, map)
 values = Array.new(10)
 random = Random.new # 乱数生成

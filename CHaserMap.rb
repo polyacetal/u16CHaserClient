@@ -31,3 +31,4 @@ class CHaserMap
                 @y = @y + 1
         end
     end
+end
