@@ -10,7 +10,7 @@ class CHaserAct
         @beforeMove = []    #前回移動した方向(常に先頭が1つ前の行動になるよう配列が伸びる)
         @ableDirection = ["Up", "Left", "Right", "Down"] #行動可能方向の定数(これと差分を取ることでいい感じになる)
         @direction = "Start" #方向を文字列で持つ(最初はstart)
-        map = CHaserMap.new(path)
+        #map = CHaserMap.new(path)
     end
 
     def Move()  #walkの処理
@@ -64,6 +64,7 @@ class CHaserAct
         end
     end
 
+    =begin
     def Nomal(values)   #通常時の行動メソッド(壁避けとランダムウォーク)
         @values = values
         WhereBlock()
@@ -71,7 +72,29 @@ class CHaserAct
         @direction = ableMove.sample
         Move()
         @blockDire.clear
-        return ItemCheck()
+        #return ItemCheck()
+        return "Nomal"
+    end
+    =end
+
+    def RandomWalk()
+        WhereBlock()
+        ableMove = @ableDirection - @blockDire
+        @direction = ableMove.sample
+        @blockDire.clear
+        Move()
+    end
+
+    def Nomal(values)
+        selection = "Nomal"
+        @values = values
+        IsEnemy()
+        if ItemCheck()
+            selection = SuspicionTrap()
+        else
+            RandomWalk()
+        end
+        return selection
     end
 
     def SuspicionTrap() #トラップの可能性があるかのチェック
@@ -105,10 +128,48 @@ class CHaserAct
         if ableItem.length == 0
             selection = "Nomal"
         else
-            selection = SuspicionTrap(ableItem)
+            selection = SuspicionTrap()
         end
         return selection
     end
+
+    =begin
+    def SuspicionTrap() #トラップの可能性があるかのチェック
+        selection = "ItemGet"   #トラップがなければ次のメソッドをItemGetに
+        case @direction
+            when "Up"   #上にトラップの可能性
+                if @values[1] == 2 && @values[3] == 2
+                    selection = "isTrap"    #次のメソッドをisTrapに
+                end
+            when "Left"
+                if @values[1] == 2 && @values[7] == 2
+                    selection = "isTrap"    #次のメソッドをisTrapに
+                end
+            when "Right"
+                if @values[3] == 2 && @values[9] == 2
+                    selection = "isTrap"    #次のメソッドをisTrapに
+                end
+            when "Down"
+                if @values[7] == 2 && @values[9] == 2
+                    selection = "isTrap"    #次のメソッドをisTrapに
+                end
+        end
+        return selection    #selectionをreturnする
+    end
+
+    def ItemCheck() #getReadyで手に入れた情報のアイテム処理用のメソッド
+        WhereItem()
+        ableItem = @ableDirection - @itemDire
+        @direction = ableItem.sample
+        @itemDire.clear
+        if ableItem.length == 0
+            selection = "Nomal"
+        else
+            selection = SuspicionTrap()
+        end
+        return selection
+    end
+    =end
 
     def isTrap(values)
         Look()
